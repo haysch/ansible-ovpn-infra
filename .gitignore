@@ -1,0 +1,17 @@
+# Extra Ansible vars and vault password file
+vars/
+vault.yml
+*vault_pass*
+
+# Testing files
+tests/docker_hosts
+id_*
+*_id_*
+# Temp entry, considering adding vagrant for testing just for research
+tests/vagrant
+
+# OpenVPN client config files
+*.ovpn
+
+# MacOS stuff
+.DS_Store

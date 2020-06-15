@@ -1,0 +1,16 @@
+---
+- name: package-CentOS |> install EPEL repository
+  become: yes
+  dnf:
+    name: epel-release
+    state: present
+
+- name: package-CentOS |> install common CentOS packages
+  become: yes
+  dnf:
+    name: "{{ centos_package_list }}"
+    state: present
+
+- name: package-CentOS |> refresh facts
+  setup:
+    gather_subset: all

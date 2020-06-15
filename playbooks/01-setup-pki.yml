@@ -1,0 +1,28 @@
+---
+- name: pre-setup
+  hosts: 
+    - openvpn
+    - ca
+
+  pre_tasks:
+    # if python3 is not installed type returns non-zero and installs python3
+    - name: Install python3 if necessary
+      become: yes
+      package:
+        name: 
+          - python3
+        state: present
+      changed_when: no
+
+- name: Initialize PKI for "{{ ansible_play_hosts }}"
+  hosts:
+    - openvpn
+    - ca
+  roles:
+    - common
+    - pki
+
+- name: Build CA
+  hosts: ca
+  roles:
+    - ca

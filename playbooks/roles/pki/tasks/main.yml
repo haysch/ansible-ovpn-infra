@@ -1,0 +1,6 @@
+---
+- name: Setup EasyRSA
+  import_tasks: setup-easyrsa.yml
+
+- name: Initialize PKI
+  import_tasks: init-pki.yml

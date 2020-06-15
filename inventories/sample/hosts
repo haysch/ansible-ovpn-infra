@@ -1,0 +1,7 @@
+[certauth]
+# Enter ip address of CA server
+#ca ansible_host=0.0.0.0 ansible_user=causr ansible_become_pass="{{ ca_ansible_become_password }}"
+
+[openvpn]
+# Enter ip address of openvpn server
+#ovpn ansible_host=0.0.0.0 ansible_user=vpnusr ansible_become_pass="{{ ovpn_ansible_become_password }}"

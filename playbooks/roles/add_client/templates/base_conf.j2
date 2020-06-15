@@ -1,0 +1,58 @@
+##############################################
+# Sample client-side OpenVPN 2.0 config file #
+# for connecting to multi-client server.     #
+#                                            #
+# This configuration can be used by multiple #
+# clients, however each client should have   #
+# its own cert and key files.                #
+#                                            #
+# On Windows, you might want to rename this  #
+# file so it has a .ovpn extension           #
+##############################################
+
+client
+dev tun
+
+proto {{ item.proto }}
+remote {{ openvpn_server_ip }} {{ item.port }}
+
+resolv-retry infinite
+nobind
+
+# Downgrade privileges after initialization (non-Windows only)
+user nobody
+group nogroup
+
+# Try to preserve some state across restarts.
+persist-key
+persist-tun
+
+remote-cert-tls server
+cipher {{ openvpn_cipher }}
+auth {{ openvpn_auth_digest }}
+key-direction 1
+
+# Set log file verbosity.
+verb 3
+
+# Silence repeating messages
+;mute 20
+
+## For use with update-resolv-conf
+## Uncomment if client has an /etc/openvpn/update-resolv-conf
+# script-security 2
+# up /etc/openvpn/update-resolv-conf
+# down /etc/openvpn/update-resolv-conf
+
+<ca>
+{{ ca_crt_content }}
+</ca>
+<cert>
+{{ client_cert_content }}
+</cert>
+<key>
+{{ client_key_content }}
+</key>
+<tls-auth>
+{{ ta_key_content }}
+</tls-auth>

@@ -1,0 +1,32 @@
+---
+- name: include-config-vars |> Read CA cert
+  no_log: true
+  slurp:
+    src: "{{ client_config_ca_crt }}"
+  register: ca_crt_slurp
+
+- name: include-config-vars |> Read client cert
+  no_log: true
+  slurp:
+    src: "{{ client_config_crt }}"
+  register: client_crt_slurp
+
+- name: include-config-vars |> Read client key
+  no_log: true
+  slurp:
+    src: "{{ client_config_key }}"
+  register: client_key_slurp
+
+- name: include-config-vars |> Read HMAC signature
+  no_log: true
+  slurp:
+    src: "{{ client_config_hmac_sign }}"
+  register: ta_key_slurp
+
+- name: include-config-vars |> Set config facts
+  no_log: true
+  set_fact:
+    ca_crt_content:       "{{ ca_crt_slurp['content'] | b64decode }}"
+    client_cert_content:  "{{ client_crt_slurp['content'] | b64decode }}"
+    client_key_content:   "{{ client_key_slurp['content'] | b64decode }}"
+    ta_key_content:       "{{ ta_key_slurp['content'] | b64decode }}"

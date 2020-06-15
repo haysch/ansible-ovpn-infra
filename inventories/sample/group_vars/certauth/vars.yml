@@ -1,0 +1,10 @@
+---
+ca_ansible_become_password: "{{ vault_ca_ansible_become_password }}"
+
+# set ca variables
+ca_common_name:     "{{ easyrsa_req_cn }}"
+ca_key:             "{{ easyrsa_path_pki }}/private/ca.key"
+ca_crt:             "{{ easyrsa_path_pki }}/ca.crt"
+ca_crl:             "{{ easyrsa_path_pki }}/crl.pem"
+ca_ovpn_req:        "{{ easyrsa_path_pki }}/reqs/{{ openvpn_common_name }}.req"
+ca_ovpn_issued_crt: "{{ easyrsa_path_pki }}/issued/{{ openvpn_common_name }}.crt"

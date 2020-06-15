@@ -1,0 +1,6 @@
+---
+- name: Install common distro packages
+  include_tasks: "package-{{ ansible_distribution }}.yml"
+
+- name: Install pip packages
+  import_tasks: pip-package.yml

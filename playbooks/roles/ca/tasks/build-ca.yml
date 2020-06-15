@@ -1,0 +1,20 @@
+---
+- name: build-ca |> Move vars template to "{{ easyrsa_path }}/vars" for CA
+  template:
+    src: easyrsa3_vars.j2
+    dest: "{{ easyrsa_path }}/vars"
+    mode: '0600'
+
+- name: build-ca |> Generate and set CA password
+  no_log: yes
+  import_tasks: generate-password.yml
+  when: ca_password is not defined
+
+- name: build-ca |> Build CA
+  expect:
+    command: ./easyrsa build-ca
+    responses:
+      'Enter New CA Key Passphrase: $': "{{ ca_password }}"
+      'Re-Enter New CA Key Passphrase: $': "{{ ca_password }}"
+    chdir: "{{ easyrsa_path }}"
+    creates: "{{ ca_key }}"

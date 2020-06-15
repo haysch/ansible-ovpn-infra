@@ -1,0 +1,24 @@
+---
+- name: package-Debian |> install common packages
+  become: yes
+  apt:
+    name: "{{ debian_package_list }}"
+    state: present
+
+- name: package-Debian |> refresh facts
+  setup:
+    gather_subset: all
+
+- name: package-Debian |> install debian-backports
+  become: yes
+  apt_repository:
+    repo: "deb http://deb.debian.org/debian {{ ansible_lsb.codename }}-backports main"
+    state: present
+    update_cache: yes
+
+- name: package-Debian |> upgrade systemd for debian
+  become: yes
+  apt:
+    name: systemd
+    state: latest
+    default_release: "{{ ansible_lsb.codename }}-backports"

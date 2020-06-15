@@ -1,0 +1,5 @@
+---
+- name: Create new client configuration for OVPN
+  hosts: openvpn
+  roles: 
+    - add_client

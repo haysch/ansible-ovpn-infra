@@ -1,0 +1,20 @@
+---
+- name: Test | Test the VPN connection
+  hosts: ovpn-client
+  become: yes
+  tasks:
+  - name: Start OpenVPN client service
+    service:
+      name: "openvpn@testuser"
+      enabled: true
+      state: started
+
+  - name: Check if ip route exists
+    shell: ip route | grep "{{ item.cidr }}"
+    with_items: "{{ openvpn_instance }}"
+    register: ip_route_res
+
+  - name: Ping OpenVPN server
+    command: ping "{{ item.gateway }}" -c 2
+    with_items:
+      - "{{ openvpn_instance }}"

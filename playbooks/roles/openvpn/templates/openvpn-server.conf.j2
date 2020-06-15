@@ -1,0 +1,66 @@
+#############################################################################################
+# See https://github.com/OpenVPN/openvpn/blob/master/sample/sample-config-files/server.conf #
+# for sample server config file and definitions.                                            #
+#############################################################################################
+
+# Which TCP/UDP port should OpenVPN listen on?
+port {{ item.port }}
+
+# TCP or UDP server?
+proto {{ item.proto }}
+
+dev tun
+
+ca {{ openvpn_ca_crt }}
+cert {{ openvpn_server_crt }}
+key {{ openvpn_server_key }}  # This file should be kept secret
+dh {{ openvpn_dh_key }}
+crl-verify {{ openvpn_crl_pem }}
+
+server {{ item.mask }}
+
+# sets static ips for clients
+client-config-dir {{ openvpn_path_ccd }}
+
+# if enabled, pushes all traffic through the VPN
+{% if item.redirect_all is defined and item.redirect_all is sameas true %}
+push "redirect-gateway def1 bypass-dhcp"
+
+{% if openvpn_dns_server is defined %}
+{% for dns_ip in openvpn_dns_server %}
+push "dhcp-option DNS {{ dns_ip }}"
+{% endfor %}
+{% endif %}
+{% endif %}
+
+# allow clients to see eachothers
+client-to-client
+
+keepalive 10 120
+
+tls-auth {{ openvpn_hmac_firewall }} 0 # This file is secret
+cipher {{ openvpn_cipher }}
+auth {{ openvpn_auth_digest }}
+
+# reduce the daemons privileges
+user nobody
+group nogroup
+
+persist-key
+persist-tun
+
+# Logging capabilities
+status /var/log/openvpn-{{ openvpn_common_name }}-status.log
+log /var/log/openvpn-{{ openvpn_common_name }}.log
+verb 3
+
+# Silence repeating messages.
+mute {{ item.mute | default(10) }}
+
+# Notify the client that when the server restarts so it
+# can automatically reconnect.
+{% if item.proto == 'udp' %}
+explicit-exit-notify 1
+{% else %}
+explicit-exit-notify 0
+{% endif %}

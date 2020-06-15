@@ -1,0 +1,28 @@
+FROM debian:10.4
+
+# update system
+RUN apt-get update && apt-get upgrade -y
+
+# install necessary packages
+RUN DEBIAN_FRONTEND=noninteractive \
+ && apt-get install -q -y sudo openssh-server openssh-client \
+    ca-certificates openvpn python3-minimal
+
+# create user to be used for ssh'ing
+RUN useradd -m -G sudo -s /bin/bash docker \
+ && echo "docker:rekcod" | chpasswd
+
+# setup ssh with authorized_keys
+RUN mkdir /home/docker/.ssh
+COPY tests/id_rsa.pub /home/docker/.ssh/authorized_keys
+RUN chown -R docker:docker /home/docker/.ssh/ \
+ && chmod 701 /home/docker \
+ && chmod 700 /home/docker/.ssh \
+ && chmod 600 /home/docker/.ssh/authorized_keys
+
+COPY tests/testuser.ovpn /etc/openvpn/testuser.conf
+
+# expose port 22 for ssh
+EXPOSE 22
+
+CMD ["/sbin/init"]

@@ -1,0 +1,15 @@
+[localhost]
+127.0.0.1
+
+[certauth]
+${ca_docker}
+
+[openvpn]
+${openvpn_docker}
+
+[client]
+${openvpn_client}
+
+[all:vars]
+# because we are testing with containers the fingerprint will change everytime the container does
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'

@@ -1,0 +1,6 @@
+---
+- name: generate-certificate |> Generate server certificate
+  command: ./easyrsa gen-req "{{ openvpn_common_name }}" nopass
+  args:
+    chdir: "{{ easyrsa_path }}"
+    creates: "{{ easyrsa_ovpn_server_key }}"

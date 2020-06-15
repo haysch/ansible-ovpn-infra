@@ -1,0 +1,42 @@
+---
+- name: setup-certificate |> Copy CA certificate to "{{ openvpn_path }}"
+  become: yes
+  command: cp "/tmp/ca.crt" "{{ openvpn_path }}"
+  args:
+    creates: "{{ openvpn_path }}/ca.crt"
+
+- name: setup-certificate |> Copy issued certificate to "{{ openvpn_path }}"
+  become: yes
+  command: cp "/tmp/{{ openvpn_common_name }}.crt" "{{ openvpn_path }}"
+  args:
+    creates: "{{ openvpn_server_crt }}"
+
+- name: setup-certificate |> Copy CRL to "{{ openvpn_path }}"
+  become: yes
+  command: cp "/tmp/crl.pem" "{{ openvpn_path }}"
+  args:
+    creates: "{{ openvpn_crl_pem }}"
+
+- name: setup-certificate |> Generate Diffie-Hellman key
+  command: ./easyrsa gen-dh
+  args:
+    chdir: "{{ easyrsa_path }}"
+    creates: "{{ easyrsa_dh_key }}"
+
+- name: setup-certificate |> Copy Diffie-Hellman key to "{{ openvpn_path }}"
+  become: yes
+  command: cp "{{ easyrsa_dh_key }}" "{{ openvpn_dh_key }}"
+  args:
+    creates: "{{ openvpn_dh_key }}"
+
+- name: setup-certificate |> Copy OVPN server key to "{{ openvpn_path }}"
+  become: yes
+  command: cp "{{ easyrsa_ovpn_server_key }}" "{{ openvpn_server_key }}"
+  args:
+    creates: "{{ openvpn_server_key }}"
+
+- name: setup-certificate |> Generate HMAC signature
+  become: yes
+  command: openvpn --genkey --secret "{{ openvpn_hmac_firewall }}"
+  args:
+    creates: "{{ openvpn_hmac_firewall }}"

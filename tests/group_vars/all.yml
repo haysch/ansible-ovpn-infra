@@ -1,0 +1,53 @@
+---
+# sets easyrsa version and path
+easyrsa_version:  "3.0.7"
+easyrsa_path:     "{{ ansible_env.HOME }}/easyrsa3"
+
+# sets default easyrsa request variables
+easyrsa_req_country:  "US"
+easyrsa_req_province: "California"
+easyrsa_req_city:     "San Francisco"
+easyrsa_req_org:      "Copyleft Certificate Co"
+easyrsa_req_email:    "me@example.net"
+easyrsa_req_ou:       "My Organizational Unit"
+easyrsa_req_cn:       "ca@docker.local"
+
+# set openvpn variables
+openvpn_common_name:  "ovpn@docker.local"
+
+# openvpn server config variables
+# NOTE: only one instance is allowed at a time.
+openvpn_instance:
+  - {
+    proto: udp,
+    port: 1194,
+    mask: "20.0.0.0 255.255.255.0",
+    gateway: "20.0.0.1",
+    cidr: "20.0.0.0/24",
+    redirect_all: false,
+    mute: 10
+  }
+
+openvpn_cipher:       "AES-256-CBC"
+openvpn_auth_digest:  "SHA256"
+openvpn_dns_server:   ["1.1.1.1", "1.0.0.1"]
+openvpn_server_ip:    "172.17.0.3"
+
+# set Diffie-Hellman key size
+dhparam_size: 2048
+
+### The below settings are common across the ovpn and ca hosts   ###
+### and should not be changed unless you know what you are doing ###
+
+# required to allow easyrsa to work without user interaction
+easyrsa_batch: yes
+
+# easyrsa path variables
+easyrsa_path_pki:         "{{ easyrsa_path }}/pki"
+easyrsa_dh_key:           "{{ easyrsa_path_pki }}/dh.pem"
+easyrsa_ovpn_server_key:  "{{ easyrsa_path_pki }}/private/{{ openvpn_common_name }}.key"
+
+# client variables used in both OVPN and CA
+easyrsa_client_req: "{{ easyrsa_path_pki }}/reqs/{{ client_name }}.req"
+easyrsa_client_key: "{{ easyrsa_path_pki }}/private/{{ client_name }}.key"
+easyrsa_client_crt: "{{ easyrsa_path_pki }}/issued/{{ client_name }}.crt"

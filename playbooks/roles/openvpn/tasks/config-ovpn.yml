@@ -1,0 +1,47 @@
+---
+- name: config-ovpn |> Enable IPv4 traffic forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+
+- name: config-ovpn |> Create client configuration directory
+  file:
+    path: "{{ openvpn_path_ccd }}"
+    state: directory
+    mode: '0755'
+
+- name: config-ovpn |> Copy template to "{{ openvpn_path }}"
+  template:
+    src: openvpn-server.conf.j2
+    dest: "{{ openvpn_path }}/{{ openvpn_common_name }}.conf"
+  with_items: "{{ openvpn_instance }}"
+
+- name: config-ovpn |> Enable OpenVPN service
+  service:
+    name: "openvpn@{{ openvpn_common_name }}"
+    enabled: true
+    state: started
+
+- name: config-ovpn |> Create client config folder
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0700'
+  with_items:
+    - "{{ client_config_path }}"
+    - "{{ client_config_path }}/keys"
+    - "{{ client_config_path }}/files"
+  notify: restart openvpn
+
+- name: config-ovpn |> Link CA cert and HMAC key to client config
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: link
+  with_items:
+    - { src: "{{ openvpn_ca_crt }}", dest: "{{ client_config_ca_crt }}" }
+    - { src: "{{ openvpn_hmac_firewall }}", dest: "{{ client_config_hmac_sign }}" }

@@ -1,0 +1,18 @@
+---
+debian_package_list:
+  - lsb-release
+  - python3-minimal
+  - python3-pip
+  - apt-utils
+  - systemd
+  - rsync
+
+centos_package_list:
+  - redhat-lsb-core
+  - python3
+  - python3-pip
+  - systemd
+  - rsync
+
+pip_packages:
+  - pexpect

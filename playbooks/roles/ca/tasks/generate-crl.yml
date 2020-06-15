@@ -1,0 +1,8 @@
+---
+- name: generate-crl |> Generate initial CRL for the OVPN server
+  expect:
+    command: ./easyrsa gen-crl
+    responses:
+      (.*)Enter pass phrase for(.*): "{{ ca_password }}"
+    chdir: "{{ easyrsa_path }}"
+    creates: "{{ ca_crl }}"

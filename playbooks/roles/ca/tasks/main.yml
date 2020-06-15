@@ -1,0 +1,6 @@
+---
+- name: Build CA
+  import_tasks: build-ca.yml
+
+- name: Generate certificate revocation list
+  import_tasks: generate-crl.yml

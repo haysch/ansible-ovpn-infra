@@ -1,0 +1,6 @@
+---
+- name: init-pki |> EasyRSA init-pki
+  command: ./easyrsa init-pki
+  args:
+    chdir: "{{ easyrsa_path }}"
+    creates: "{{ easyrsa_path_pki }}"

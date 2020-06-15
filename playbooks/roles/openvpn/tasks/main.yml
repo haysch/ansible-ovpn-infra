@@ -1,0 +1,32 @@
+---
+- name: Install OpenVPN packages
+  import_tasks: install.yml
+
+- name: Generate OpenVPN server certificates
+  import_tasks: generate-certificate.yml
+
+- name: Include CA group_vars
+  include_vars: 
+    dir: "{{ inventory_dir }}/group_vars/certauth"
+    extensions:
+      - yml
+      - yaml
+
+- name: Sign OpenVPN server certificates
+  import_tasks: sign-certificate.yml
+  delegate_to: ca
+
+- name: Install OpenVPN server certificates
+  import_tasks: setup-certificate.yml
+
+- name: Configure OpenVPN server
+  include_tasks: config-ovpn.yml
+  args:
+    apply:
+      become: yes
+
+- name: Configure OpenVPN firewall
+  include_tasks: "firewall-{{ ansible_distribution }}.yml"
+  args:
+    apply:
+      become: yes

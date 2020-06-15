@@ -1,0 +1,1 @@
+{{TEMPLATE FILE - replace with vault password if using current setup}}

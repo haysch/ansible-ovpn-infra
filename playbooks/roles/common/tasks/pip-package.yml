@@ -1,0 +1,5 @@
+---
+- name: pip-package | install necessary pip packages
+  pip:
+    name: "{{ pip_packages }}"
+    extra_args: --user

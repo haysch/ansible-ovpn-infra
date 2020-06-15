@@ -1,0 +1,40 @@
+---
+- name: setup-easyrsa |> Create tmp working directory
+  tempfile:
+    state: directory
+    suffix: easyrsa
+  register: temp_easyrsa
+
+- name: "setup-easyrsa |> Unarchive easy-rsa v{{ easyrsa_version }} from Github"
+  unarchive:
+    src: "https://github.com/OpenVPN/easy-rsa/releases/download/v{{ easyrsa_version }}/EasyRSA-{{ easyrsa_version }}.tgz"
+    dest: "{{ temp_easyrsa.path }}"
+    remote_src: yes
+    list_files: yes
+    keep_newer: yes
+  register: easyrsa_archive # register to get the folder from the archive
+
+- name: setup-easyrsa |> Does archive contain files or directory?
+  stat: 
+    path: "{{ temp_easyrsa.path }}/{{ easyrsa_archive.files[0] }}"
+  register: archive_result
+
+- name: setup-easyrsa |> ensure destination directory exists
+  file:
+    path: "{{ easyrsa_path }}"
+    state: directory
+    mode: '0700'
+
+# NOTE: Does NOT create destination directory if 'remote_src: yes'
+#       The above step ensure that the directory exists.
+- name: setup-easyrsa |> Copy EasyRSA folder to specified destination
+  copy:
+    src: "{{ temp_easyrsa.path }}/{{ easyrsa_archive.files[0] }}" # {TMP_PATH}/EasyRSA-{VERSION}/
+    dest: "{{ easyrsa_path }}"
+    remote_src: yes
+  when: archive_result.stat.isdir is defined and archive_result.stat.isdir
+
+- name: setup-easyrsa |> Make `easyrsa` executable
+  file:
+    dest: "{{ easyrsa_path }}/easyrsa"
+    mode: a+x

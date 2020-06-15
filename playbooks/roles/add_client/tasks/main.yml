@@ -1,0 +1,17 @@
+---
+- name: Generate new keypair for client
+  import_tasks: generate-keypair.yml
+  
+- name: Include CA group_vars
+  include_vars: 
+    dir: "{{ inventory_dir }}/group_vars/certauth"
+    extensions:
+      - yml
+      - yaml
+      
+- name: Sign client certificate
+  import_tasks: sign-certificate.yml
+  delegate_to: ca
+
+- name: Generate client configuration
+  import_tasks: generate-client-config.yml

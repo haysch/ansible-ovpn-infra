@@ -1,0 +1,17 @@
+- name: install |> Install required packages
+  vars:
+    plist: "{{ ansible_distribution | lower }}_package_list"
+  become: yes
+  package:
+    name: "{{ vars[plist] }}"
+    state: present
+  register: install_required_result
+  until: install_required_result is success
+  retries: 5
+  delay: 5
+
+- name: install |> Move template to 'vars'
+  template:
+    src: easyrsa3_ovpn_vars.j2
+    dest: "{{ easyrsa_path }}/vars"
+    mode: '0600'

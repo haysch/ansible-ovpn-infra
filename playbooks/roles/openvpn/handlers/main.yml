@@ -1,0 +1,6 @@
+---
+- name: restart openvpn
+  become: yes
+  service:
+    name: "openvpn@{{ openvpn_common_name }}"
+    state: restarted

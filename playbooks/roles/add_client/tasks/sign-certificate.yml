@@ -1,0 +1,27 @@
+---
+- name: sign-certificate |> Pull "{{ client_name }}" certificate from OVPN server
+  synchronize:
+    src: "{{ easyrsa_client_req }}"
+    dest: /tmp
+    mode: pull
+
+- name: sign-certificate |> Import client certificate
+  command: ./easyrsa import-req "/tmp/{{ client_name }}.req" "{{ client_name }}"
+  args:
+    chdir: "{{ easyrsa_path }}"
+    creates: "{{ easyrsa_client_req }}"
+
+- name: sign-certificate |> Sign client certificate
+  no_log: true
+  expect:
+    command: ./easyrsa sign-req client "{{ client_name }}"
+    responses:
+      (.*)Enter pass phrase for(.*): "{{ ca_password }}"
+    chdir: "{{ easyrsa_path }}"
+    creates: "{{ easyrsa_client_crt }}"
+
+- name: sign-certificate |> Push client certificate to OVPN server
+  synchronize:
+    src: "{{ easyrsa_client_crt }}"
+    dest: /tmp
+    mode: push

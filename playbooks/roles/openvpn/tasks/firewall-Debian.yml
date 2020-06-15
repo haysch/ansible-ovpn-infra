@@ -1,0 +1,29 @@
+---
+- name: firewall-Debian |> Move UFW template to /etc/ufw/before.rules.ovpn
+  template:
+    src: etc_ufw_before.rules.j2
+    dest: /etc/ufw/before.rules.ovpn
+    mode: '0640'
+    output_encoding: us-ascii
+
+- name: firewall-Debian |> Change UFW default FORWARD policy
+  ufw:
+    direction: routed
+    default: allow
+    route: yes
+
+- name: firewall-Debian |> Allow OpenVPN port and proto
+  ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}" # if using VSCode - this is correct, but the language server will yell at you
+  with_items: "{{ openvpn_instance }}"
+
+- name: firewall-Debian |> Allow OpenSSH
+  ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: firewall-Debian |> Enables and reload UFW
+  ufw:
+    state: enabled

@@ -1,0 +1,24 @@
+---
+ovpn_ansible_become_password: "{{ vault_ovpn_ansible_become_password }}"
+
+# openvpn path variables
+openvpn_path:           "/etc/openvpn"
+openvpn_server_key:     "{{ openvpn_path }}/{{ openvpn_common_name }}.key"
+openvpn_ca_crt:         "{{ openvpn_path }}/ca.crt"
+openvpn_server_crt:     "{{ openvpn_path }}/{{ openvpn_common_name }}.crt"
+openvpn_dh_key:         "{{ openvpn_path }}/dh.pem"
+openvpn_hmac_firewall:  "{{ openvpn_path }}/ta.key"
+openvpn_path_ccd:       "{{ openvpn_path }}/ccd"
+openvpn_crl_pem:        "{{ openvpn_path }}/crl.pem"
+
+# client config path variables
+client_config_path:       "{{ ansible_env.HOME }}/client-configs"
+client_config_keys_path:  "{{ client_config_path }}/keys"
+client_config_files_path: "{{ client_config_path }}/files"
+
+# client config variables (on OVPN)
+client_config_ca_crt:     "{{ client_config_keys_path}}/ca.crt"
+client_config_hmac_sign:  "{{ client_config_keys_path}}/ta.key"
+client_config_crt:        "{{ client_config_keys_path }}/{{ client_name }}.crt"
+client_config_key:        "{{ client_config_keys_path }}/{{ client_name }}.key"
+client_config_ovpn:       "{{ client_config_files_path }}/{{ client_name }}.ovpn"

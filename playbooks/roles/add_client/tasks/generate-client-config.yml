@@ -1,0 +1,20 @@
+---
+- name: generate-client-config |> Copy signed client certificate
+  command: cp "/tmp/{{ client_name }}.crt" "{{ client_config_crt }}"
+  args:
+    creates: "{{ client_config_crt }}"
+
+- name: generate-client-config |> Import necessary client config files
+  import_tasks: include-config-vars.yml
+
+- name: generate-client-config |> Generate client configuration
+  template:
+    src: base_conf.j2
+    dest: "{{ client_config_ovpn }}"
+  with_items: "{{ openvpn_instance }}"
+
+- name: generate-client-config |> Fetch client configuration from remote machine
+  fetch:
+    src: "{{ client_config_ovpn }}"
+    dest: /tmp/
+    flat: yes

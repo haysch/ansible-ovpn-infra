@@ -1,0 +1,18 @@
+---
+## OpenVPN packages ##
+debian_package_list:
+  - gnupg
+  - iptables
+  - iptables-persistent
+  - openssl
+  - openvpn
+  - ufw
+
+centos_package_list:
+  - gnupg
+  - iptables
+  - iptables-services
+  - openssl
+  - openvpn
+  - firewalld
+## End OpenVPN packages ##
