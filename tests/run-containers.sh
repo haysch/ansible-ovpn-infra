@@ -2,11 +2,11 @@
 
 set -e
 
-RUN_OPTS="-d --privileged"
+RUN_OPTS="-d --cap-add=NET_ADMIN --device=/dev/net/tun --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro"
 CA_DISTRIBUTION="${CA_DISTRIBUTION:-centos}"
 CA_VERSION="${CA_VERSION:-8}"
-OPVN_DISTRIBUTION="${OPVN_DISTRIBUTION:-debian}"
-OPVN_VERSION="${OPVN_VERSION:-10.4}"
+OVPN_DISTRIBUTION="${OVPN_DISTRIBUTION:-debian}"
+OVPN_VERSION="${OPVN_VERSION:-10.4}"
 
 setup_container() {
   container_id=$(docker run ${RUN_OPTS} --name $3 ansible-ovpn-infra/$1:$2)
@@ -16,7 +16,7 @@ setup_container() {
 }
 
 ca_container=$(setup_container $CA_DISTRIBUTION $CA_VERSION "ca")
-ovpn_container=$(setup_container $OPVN_DISTRIBUTION $OPVN_VERSION "ovpn")
+ovpn_container=$(setup_container $OVPN_DISTRIBUTION $OPVN_VERSION "ovpn")
 
 # replace ${} parameters in template file
 sed -e 's/${ca_docker}/'"$ca_container"'/g' -e 's/${openvpn_docker}/'"$ovpn_container"'/g' tests/docker_hosts.template > tests/docker_hosts
