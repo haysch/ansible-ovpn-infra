@@ -1,4 +1,7 @@
 ---
+- name: firewall-Debian |> Refresh facts
+  setup: # VSCode language server complains - blah blah
+
 - name: firewall-Debian |> Move UFW template to /etc/ufw/before.rules.ovpn
   template:
     src: etc_ufw_before.rules.j2

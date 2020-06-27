@@ -1,8 +1,11 @@
 ---
 - name: config-ovpn |> Enable IPv4 traffic forwarding
+  vars:
+    env_container: "{{ lookup('env', 'CONTAINER') }}"
   sysctl:
     name: net.ipv4.ip_forward
     value: '1'
+  when: env_container is undefined
 
 - name: config-ovpn |> Create client configuration directory
   file:
