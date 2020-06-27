@@ -1,24 +1,26 @@
 FROM centos:8
 
+ENV CONTAINER=docker
+
 # update system
-RUN yum update -y \
- && yum clean all
+RUN dnf update -y \
+    && dnf clean all
 
 # install necessary packages
-RUN yum install -y sudo openssh-server openssh-clients \
+RUN dnf install -y sudo openssh-server openssh-clients \
     python3 ca-certificates
 
-# create user used for ssh'ing
+# create user used for ssh
 RUN useradd -m -G wheel -s /bin/bash docker \
- && echo "docker:rekcod" | chpasswd
+    && echo "docker:rekcod" | chpasswd
 
 # setup ssh with authorized_keys
 RUN mkdir /home/docker/.ssh
 COPY tests/id_rsa.pub /home/docker/.ssh/authorized_keys
-RUN chown -R docker:docker /home/docker/.ssh/ && \
-    chmod 701 /home/docker && \
-    chmod 700 /home/docker/.ssh && \
-    chmod 600 /home/docker/.ssh/authorized_keys
+RUN chown -R docker:docker /home/docker/.ssh/ \
+    && chmod 701 /home/docker \
+    && chmod 700 /home/docker/.ssh \
+    && chmod 600 /home/docker/.ssh/authorized_keys
 
 # expose port 22 for ssh
 EXPOSE 22
