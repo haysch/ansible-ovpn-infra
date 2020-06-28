@@ -26,6 +26,8 @@ It is worth noting that this project is in a very early state, which means that 
   * In `playbooks/roles/ca/tasks/build-ca.yml` since the CA is already built and will not be overwritten.
 * At the moment the **openvpn** role only work for Debian 10.
 * The current setup only allows for a **SINGLE** OpenVPN instance to be created and run.
+* The current testing suite, using containers, does not work on Docker Desktop for Windows or MacOS, due to them not being able to route traffic to the Linux containers, as specified in the documentation. [Windows](https://docs.docker.com/docker-for-windows/networking/#i-cannot-ping-my-containers) and [MacOS](https://docs.docker.com/docker-for-mac/networking/#i-cannot-ping-my-containers).
+  * **Workaround**: Test in VM running a Linux distribution.
 
 # Usage
 
@@ -104,7 +106,7 @@ Furthermore, the `Makefile` contains a few configuration variables to avoid repe
 # Testing
 
 You will have to place your public ssh key, `id_rsa.pub`, in the `tests/` folder since it is copied to the containers upon build of container images.
-If you generate a new ssh key, you will have to use `ssh-agent` or update the `tests/docker_hosts.template` with `ansible_ssh_private_key_file`, again place `id_rsa.pub` in `tests/` (**This is going to be described at some point).
+If you generate a new ssh key, you will have to use `ssh-agent` or update the `tests/docker_hosts.template` with `ansible_ssh_private_key_file`, again place `id_rsa.pub` in `tests/` (**This is going to be described at some point), see [Setup SSH for testing](#setupsshfortesting) below.
 
 The testing suite makes use of docker containers for easily setting up and disposing of containers when testing changes.
 
@@ -119,9 +121,38 @@ The testing flow has its own `group_vars` and `host_vars` with all values filled
 
 `run-client-container.sh` sets up a Debian client container to test the OVPN connection.
 
-## Generate SSH key for testing
+## Setup SSH for testing
 
-On the `TODO.md` list :-)
+One important aspect of the setup is that the `ca` and `ovpn` delegate tasks to each other, i.e. `ovpn` delegates a signing task to the `ca` machine.
+
+For this, we use *SSH ForwardAgent*, thus you will have to ensure that the `ssh-agent` is running
+
+```bash
+eval $(ssh-agent -s)
+```
+
+### Generating or using existing keypair
+
+Now, we have to generate or use an existing keypair that is going to be added to the `ssh-agent`.
+For generating a key, use the following, which generates a keypair to the `tests/` folder.
+
+```bash
+ssh-keygen -t rsa -b 4096 -C "ansible-ovpn-test" -f tests/id_rsa
+```
+
+**Note:** The above command assumes that your current directory is **ansible-ovpn-infra**.
+
+If you want to use an existing keypair, just copy the public key to the `tests/` folder.
+
+### Setup usage of generated/existing keypair
+
+To finish the setup, add the generated or existing private key to your `ssh-agent` by doing the following
+
+```bash
+ssh-add /path/to/id_rsa
+```
+
+which could be `tests/id_rsa` or wherever your private key hides.
 
 ## Running tests
 
@@ -150,8 +181,15 @@ The flow is as follows:
 If you want to change the images used, e.g. for the CA container, you can do the following
 
 ```bash
-export CA_DISTRIBUTION="debian"
-export CA_VERSION="10.4"
+export CA_DISTRIBUTION=debian
+export CA_VERSION=10.4
+```
+
+or the OVPN container (CentOS not usable as OVPN server - yet!)
+
+```bash
+export OVPN_DISTRIBUTION=centos
+export OVPN_VERSION=8
 ```
 
 Replace **CA** with **OVPN** to change the OpenVPN container.
@@ -168,5 +206,7 @@ Specific and sensitive variables are kept in their respective `group_vars/<group
 Each group folder contains a `vars.yml` and `vault.yml`, where `vault.yml` should always be encrypted and `vars.yml` should contain non-secret variables and reference `vault.yml` for secret variables.
 I have added `vault.yml` to `gitignore` to avoid pushing potentially unencrypted files and brute-forcing.
 
-The keen eyed might have seen the `gitignore` contains `test/vagrant`.
+During the development of this project, I have found that `--privileged` makes everything easier since you basically enable the container to act as it wants. However, this is not optimal since it basically kills any TTY in Debian and Ubuntu hosts (and maybe others? Have not attempted) when the `ansible-ovpn-infra/debian:10.4` image with `CMD ["/sbin/init"]` and `--privileged` run option.
+
+The keen eyed might have seen the `gitignore` contains `tests/vagrant`.
 I would be interested in setting up a test suite using Vagrant just for the sack of researching, but not sure when..

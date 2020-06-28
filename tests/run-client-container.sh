@@ -2,7 +2,7 @@
 
 set -e
 
-RUN_OPTS="-d --privileged"
+RUN_OPTS="-d --cap-add=NET_ADMIN --device=/dev/net/tun --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro"
 
 setup_container() {
   container_id=$(docker run ${RUN_OPTS} --name $3 ansible-ovpn-infra/$1:$2)

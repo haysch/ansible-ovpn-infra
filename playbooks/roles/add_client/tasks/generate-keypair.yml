@@ -1,6 +1,6 @@
 ---
 - name: generate-keypair |> Generate client request
-  command: ./easyrsa gen-req {{ client_name }} nopass
+  command: ./easyrsa gen-req "{{ client_name }}" nopass
   args:
     chdir: "{{ easyrsa_path }}"
     creates: "{{ easyrsa_client_key }}"
