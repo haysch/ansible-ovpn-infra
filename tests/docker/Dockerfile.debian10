@@ -6,11 +6,13 @@ ENV CONTAINER=docker
 RUN apt-get update \
     && apt-get upgrade -y
 
-# install necessary packages
+# install necessary packages (openssh, sudo and python3)
+# and packages to speed process (openvpn and ping)
 RUN DEBIAN_FRONTEND=noninteractive \
     && apt-get install -q -y \
         sudo openssh-server openssh-client \
-        ca-certificates openvpn python3-minimal
+        ca-certificates openvpn python3-minimal \
+        iputils-ping
 
 # create user to be used for ssh
 RUN useradd -m -G sudo -s /bin/bash docker \
