@@ -1,7 +1,7 @@
 ---
 - name: sign-certificate |> Pull OVPN certificate from OVPN server
   synchronize:
-    src: "{{ easyrsa_path }}/pki/reqs/{{ openvpn_common_name }}.req"
+    src: "{{ easyrsa_path_pki }}/reqs/{{ openvpn_common_name }}.req"
     dest: /tmp
     mode: pull
 
