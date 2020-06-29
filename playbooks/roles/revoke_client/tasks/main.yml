@@ -1,0 +1,14 @@
+---
+- name: Revoking of client certificate
+  import_playbook: revoke.yml
+
+- name: Include OVPN group_vars
+  include_vars: 
+    dir: "{{ inventory_dir }}/group_vars/openvpn"
+    extensions:
+      - yml
+      - yaml
+
+- name: Configure OpenVPN with new CRL list
+  import_playbook: transfer_crl.yml
+  delegate_to: ovpn

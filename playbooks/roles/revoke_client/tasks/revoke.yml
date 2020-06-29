@@ -1,0 +1,10 @@
+---
+- name: revoke |> Revoke client certificate
+  command: ./easyrsa revoke "{{ client_name }}"
+  args:
+    chdir: "{{ easyrsa_path }}"
+
+- name: revoke |> Generate new CRL
+  command: ./easyrsa gen-crl
+  args:
+    chdir: "{{ easyrsa_path }}"
