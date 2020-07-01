@@ -1,18 +1,22 @@
 ---
 debian_package_list:
+  - ca-certificates
   - lsb-release
   - python3-minimal
   - python3-pip
   - apt-utils
   - systemd
   - rsync
+  - openssl
 
 centos_package_list:
+  - ca-certificates
   - redhat-lsb-core
   - python3
   - python3-pip
   - systemd
   - rsync
+  - openssl
 
 pip_packages:
   - pexpect
