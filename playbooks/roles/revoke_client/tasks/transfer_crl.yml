@@ -5,7 +5,8 @@
     dest: /tmp
     mode: pull
 
-- name: transfer_crl |> Copy CRL to "{{ openvpn_paht }}"
+- name: transfer_crl |> Copy CRL to "{{ openvpn_path }}"
+  become: yes
   copy:
     src: /tmp/crl.pem
     dest: "{{ openvpn_path }}"
