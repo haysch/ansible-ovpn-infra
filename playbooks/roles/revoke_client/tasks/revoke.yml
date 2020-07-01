@@ -1,6 +1,6 @@
 ---
 - name: revoke |> Revoke client certificate
-  command: ./easyrsa revoke "{{ client_name }}"
+  command: ./easyrsa revoke "{{ client_name | mandatory }}"
   args:
     chdir: "{{ easyrsa_path }}"
 
