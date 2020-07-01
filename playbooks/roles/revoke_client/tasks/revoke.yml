@@ -1,10 +1,15 @@
 ---
 - name: revoke |> Revoke client certificate
-  command: ./easyrsa revoke "{{ client_name | mandatory }}"
-  args:
+  no_log: true
+  expect:
+    command: ./easyrsa revoke "{{ client_name | mandatory }}"
+    responses:
+      (.*)Enter pass phrase for(.*): "{{ ca_password }}"
     chdir: "{{ easyrsa_path }}"
 
 - name: revoke |> Generate new CRL
-  command: ./easyrsa gen-crl
-  args:
+  expect:
+    command: ./easyrsa gen-crl
+    responses:
+      (.*)Enter pass phrase for(.*): "{{ ca_password }}"
     chdir: "{{ easyrsa_path }}"
