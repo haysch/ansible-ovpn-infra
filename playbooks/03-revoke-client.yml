@@ -1,5 +1,5 @@
 ---
 - name: Revoke client certificate
-  hosts: ca
+  hosts: openvpn
   roles: 
     - revoke_client
