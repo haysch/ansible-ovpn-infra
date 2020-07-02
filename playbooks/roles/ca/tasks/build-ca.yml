@@ -11,6 +11,7 @@
   when: ca_password is not defined
 
 - name: build-ca |> Build CA
+  no_log: true
   expect:
     command: ./easyrsa build-ca
     responses:

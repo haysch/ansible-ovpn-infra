@@ -2,6 +2,7 @@
 - name: Test | Test the VPN connection
   hosts: ovpn-client
   become: yes
+  tags: test
   tasks:
   - name: Start OpenVPN client service
     service:
@@ -12,9 +13,22 @@
   - name: Check if ip route exists
     shell: ip route | grep "{{ item.cidr }}"
     with_items: "{{ openvpn_instance }}"
-    register: ip_route_res
 
   - name: Ping OpenVPN server
     command: ping "{{ item.gateway }}" -c 2
-    with_items:
-      - "{{ openvpn_instance }}"
+    with_items: "{{ openvpn_instance }}"
+  
+- name: Revoke | Test the VPN connection after revocation
+  hosts: ovpn-client
+  become: yes
+  tags: revoke
+  tasks:
+    - name: Check if ip route exists
+      shell: ip route | grep "{{ item.cidr }}"
+      with_items: "{{ openvpn_instance }}"
+
+    - name: Ping OpenVPN server
+      command: ping "{{ item.gateway }}" -c 2
+      with_items: "{{ openvpn_instance }}"
+      register: ping_result
+      failed_when: ping_result.rc == 0

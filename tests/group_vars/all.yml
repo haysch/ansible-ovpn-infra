@@ -44,6 +44,7 @@ easyrsa_batch: yes
 
 # easyrsa path variables
 easyrsa_path_pki:         "{{ easyrsa_path }}/pki"
+easyrsa_path_revoked:     "{{ easyrsa_path_pki }}/revoked"
 easyrsa_dh_key:           "{{ easyrsa_path_pki }}/dh.pem"
 easyrsa_ovpn_server_key:  "{{ easyrsa_path_pki }}/private/{{ openvpn_common_name }}.key"
 

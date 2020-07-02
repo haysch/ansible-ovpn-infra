@@ -1,0 +1,15 @@
+---
+- name: transfer_crl |> Pull updated CRL from CA
+  synchronize:
+    src: "{{ ca_crl }}"
+    dest: /tmp
+    mode: pull
+
+- name: transfer_crl |> Copy CRL to "{{ openvpn_path }}"
+  become: yes
+  copy:
+    src: /tmp/crl.pem
+    dest: "{{ openvpn_path }}"
+    remote_src: yes
+  notify:
+    - restart openvpn

@@ -50,4 +50,7 @@ docker-test: docker-build
 	mv /tmp/testuser.ovpn tests/
 	docker build --rm=true -f tests/docker/Dockerfile.client.debian10 -t ansible-ovpn-infra/debian-client:10.4 .
 	./tests/run-client-container.sh
-	ansible-playbook -i $(testfile) tests/test-connection.yml
+	ansible-playbook -i $(testfile) --tags test tests/test-connection.yml
+
+	ansible-playbook -i $(testfile) playbooks/03-revoke-client.yml -e "client_name=testuser"
+	ansible-playbook -i $(testfile) --tags revoke tests/test-connection.yml

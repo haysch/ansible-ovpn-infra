@@ -1,0 +1,14 @@
+---
+- name: Include CA group_vars
+  include_vars: 
+    dir: "{{ inventory_dir }}/group_vars/certauth"
+    extensions:
+      - yml
+      - yaml
+
+- name: Revoking of client certificate
+  import_tasks: revoke.yml
+  delegate_to: ca
+
+- name: Configure OpenVPN with new CRL list
+  import_tasks: transfer_crl.yml
