@@ -1,5 +1,6 @@
 ---
 - name: generate-crl |> Generate initial CRL for the OVPN server
+  no_log: true
   expect:
     command: ./easyrsa gen-crl
     responses:
