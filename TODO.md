@@ -1,8 +1,6 @@
 # TODO
 
 * Setup flow for CentOS OVPN server
-* Playbook for revoking of client
-  * Add testing of revoking including connection
 * Setup automatic testing
 
 ## Extras
