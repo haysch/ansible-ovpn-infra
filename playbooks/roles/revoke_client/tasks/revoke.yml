@@ -1,11 +1,24 @@
 ---
+- name: revoke |> Read client certificate
+  no_log: true
+  shell: cat "{{ easyrsa_client_crt }}" | head -n 5
+  register: cert_result
+
+- name: revoke |> Find serial number
+  no_log: true
+  vars:
+    client_cert_data: "{{ cert_result.stdout | from_yaml }}"
+  set_fact:
+    cert_serial_number: "{{ client_cert_data['Certificate']['Data']['Serial Number'] | replace(':', '') | upper }}"
+
 - name: revoke |> Revoke client certificate
   no_log: true
   expect:
-    command: ./easyrsa revoke "{{ client_name | mandatory }}"
+    command: ./easyrsa revoke "{{ client_name }}"
     responses:
       (.*)Enter pass phrase for(.*): "{{ ca_password }}"
     chdir: "{{ easyrsa_path }}"
+    creates: "{{ easyrsa_path_revoked }}/{{ cert_serial_number }}."
 
 - name: revoke |> Generate new CRL
   expect:
