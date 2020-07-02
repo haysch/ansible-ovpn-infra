@@ -41,7 +41,7 @@ It is worth noting that this project is in a very early state, which means that 
 ## Structure
 
 * `inventories` contains a sample folder with the necessary variables and hosts.
-* `playbooks` contains the playbooks, and roles, to interact with machines.
+* `playbooks` contains the playbooks, and roles, to orchestrate the machines.
   * `setup-pki.yml`:
     * `common`: common packages needed for running the OVPN and CA servers.
     * `pki`: common setup of public key infrastructure of the OVPN and CA servers.
@@ -50,9 +50,10 @@ It is worth noting that this project is in a very early state, which means that 
     * `openvpn`: setup and configure the OVPN service.
   * `add-client.yml`:
     * `add_client`: generate client config.
-  * `revoke-client.yml`: UNDER CONSTRUCTION
+  * `revoke-client.yml`: 
+    * `revoke_client`: revoke client certificate.
 * `Makefile` provides easier access to the different playbooks and testing suite.
-* `ansible.cfg` provides some basic settings like the interperet, default vault password file and forwarding SSH agent.
+* `ansible.cfg` provides some basic settings like the interpreter, default vault password file and forwarding SSH agent.
 
 ## Setup
 
@@ -123,7 +124,7 @@ The testing flow has its own `group_vars` and `host_vars` with all values filled
 
 ## Setup SSH for testing
 
-One important aspect of the setup is that the `ca` and `ovpn` delegate tasks to each other, i.e. `ovpn` delegates a signing task to the `ca` machine.
+One **important** aspect of the setup is that the `ca` and `ovpn` delegate tasks to each other, i.e. `ovpn` delegates a signing task to the `ca` machine.
 
 For this, we use *SSH ForwardAgent*, thus you will have to ensure that the `ssh-agent` is running
 
@@ -152,7 +153,7 @@ To finish the setup, add the generated or existing private key to your `ssh-agen
 ssh-add /path/to/id_rsa
 ```
 
-which could be `tests/id_rsa` or wherever your private key hides.
+which could be `tests/id_rsa` or wherever your private key hides. By omitting `/path/to/id_rsa` then `~/.ssh/id_rsa` will be used as default - this requires you to copy the `id_rsa.pub` to `tests/`.
 
 ## Running tests
 
@@ -162,7 +163,7 @@ If you just want to build the container images then run,
 make docker-build
 ```
 
-Otherwise run the following to execute the entire testing flow, this target also depends on `docker-test`:
+Otherwise run the following to execute the entire testing flow, this target depends on `docker-build`:
 
 ```bash
 make docker-test
