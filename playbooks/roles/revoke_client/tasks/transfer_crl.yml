@@ -3,7 +3,8 @@
   synchronize:
     src: "{{ ca_crl }}"
     dest: /tmp
-    mode: pull
+    mode: push
+  delegate_to: ca
 
 - name: transfer_crl |> Copy CRL to "{{ openvpn_path }}"
   become: yes
