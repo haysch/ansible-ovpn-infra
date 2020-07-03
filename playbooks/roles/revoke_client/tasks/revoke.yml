@@ -18,7 +18,7 @@
     responses:
       (.*)Enter pass phrase for(.*): "{{ ca_password }}"
     chdir: "{{ easyrsa_path }}"
-    creates: "{{ easyrsa_path_revoked }}/{{ cert_serial_number }}."
+    creates: "{{ easyrsa_path_revoked }}/certs_by_serial/{{ cert_serial_number }}.crt"
 
 - name: revoke |> Generate new CRL
   no_log: true
