@@ -10,6 +10,7 @@
     client_cert_data: "{{ cert_result.stdout | from_yaml }}"
   set_fact:
     cert_serial_number: "{{ client_cert_data['Certificate']['Data']['Serial Number'] | replace(':', '') | upper }}"
+  when: cert_result.stdout != ""
 
 - name: revoke |> Revoke client certificate
   no_log: true
@@ -18,7 +19,8 @@
     responses:
       (.*)Enter pass phrase for(.*): "{{ ca_password }}"
     chdir: "{{ easyrsa_path }}"
-    creates: "{{ easyrsa_path_revoked }}/{{ cert_serial_number }}."
+    creates: "{{ easyrsa_path_revoked }}/certs_by_serial/{{ cert_serial_number }}.crt"
+  when: cert_serial_number is defined
 
 - name: revoke |> Generate new CRL
   no_log: true
