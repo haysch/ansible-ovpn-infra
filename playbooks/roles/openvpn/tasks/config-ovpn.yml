@@ -5,7 +5,7 @@
   sysctl:
     name: net.ipv4.ip_forward
     value: '1'
-  when: env_container is undefined
+  when: env_container is not true
 
 - name: config-ovpn |> Create client configuration directory
   file:

@@ -2,10 +2,10 @@
 - name: firewall-Debian |> Refresh facts
   setup: # VSCode language server complains - blah blah
 
-- name: firewall-Debian |> Move UFW template to /etc/ufw/before.rules.ovpn
+- name: firewall-Debian |> Move UFW template to /etc/ufw/before.rules
   template:
     src: etc_ufw_before.rules.j2
-    dest: /etc/ufw/before.rules.ovpn
+    dest: /etc/ufw/before.rules
     mode: '0640'
     output_encoding: us-ascii
 
