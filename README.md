@@ -21,6 +21,7 @@ It is worth noting that this project is in a very early state, which means that 
 
 ### Known shortcomings
 
+* **IMPORTANT**: When running the `pki` role, the `group_vars/certauth/vault.yml` must NOT be encrypted.
 * It is not possible to redo the `pki` setup after first run. The role will fail due to two things:
   * In `playbooks/roles/pki/tasks/init-pki.yml` since the pki is already initialized.
   * In `playbooks/roles/ca/tasks/build-ca.yml` since the CA is already built and will not be overwritten.
@@ -28,6 +29,8 @@ It is worth noting that this project is in a very early state, which means that 
 * The current setup only allows for a **SINGLE** OpenVPN instance to be created and run.
 * The current testing suite, using containers, does not work on Docker Desktop for Windows or MacOS, due to them not being able to route traffic to the Linux containers, as specified in the documentation. [Windows](https://docs.docker.com/docker-for-windows/networking/#i-cannot-ping-my-containers) and [MacOS](https://docs.docker.com/docker-for-mac/networking/#i-cannot-ping-my-containers).
   * **Workaround**: Test in VM running a Linux distribution.
+* The ansible `synchronize` module did NOT perform as expected. It sometimes worked when testing, sometimes it work on different machines and almost never was it a reproducable output. I therefore changed to using `rsync` directly, since it allowed me to do as I wanted without the inconsistency of `synchronize`.
+* Ansible also did not update the `ansible_env` dynamically when using `delegate_to` in ansible version 2.9.12, but it worked in previous versions. Thus, I added a `gather_facts` task in and after a `delegate_to`.
 
 # Usage
 
@@ -75,10 +78,22 @@ You will also want to update the `group_vars/all.yml` and each `group_vars/<grou
 The project makes use of `group_vars` vaults.
 Each group contains a `vars.yml` and `vault.yml`, where `vars.yml` contains non-sensitive variables and references `vault.yml` variables, and `vault.yml` contains sensitive variables, as described in the [Ansible Best Practives](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html#variables-and-vaults).
 
+Create a `.vault_pass.txt`, or update `ansible.cfg` with the new vault pass path, and enter the vault pass to be used for encrypting/decrypting.
+
 ## Running the playbooks
+
+This project makes use of `ForwardAgent` to communicating between multiple nodes, like `rsync` across two nodes without going through the mothership.
+Thus, you will have to start up a `ssh-agent` and add your `id_rsa` to it.
+
+```
+eval $(ssh-agent -s)
+ssh-add [inventories/<FOLDER>/id_rsa]
+```
 
 You can choose to run the playbooks by using the `ansible-playbook` directly or by using the provided `Makefile`.
 If you do not want to use the `Makefile` you can consult the `Makefile` on how `ansible-playbook` is used.
+
+If you do use the `Makefile`, remember to update the `inventory` variable to point to the correct inventory directory.
 
 The provided `Makefile` gives access to the following targets:
 
@@ -90,6 +105,7 @@ The provided `Makefile` gives access to the following targets:
 | `add-client NAME=testuser` | generate a client configuration with name *testuser*. |
 | `revoke-client NAME=testuser` | revokes access for client with name *testuser*. |
 | `encrypt`/`decrypt` | encrypts/decrypts the Ansible vault files at the specified location in the `vaultfiles` variable. |
+| | |
 | `encrypt-test`/`decrypt-test` | encrypts/decrypts the test vaults files to mirror actual setup. |
 | `docker-build` | builds the `Dockerfile.centos8` and `Dockerfile.debian10` images. |
 | `docker-test` | runs the test suite as specified in [Testing](#Testing). |
