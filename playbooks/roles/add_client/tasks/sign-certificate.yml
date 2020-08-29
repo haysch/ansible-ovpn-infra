@@ -1,9 +1,11 @@
 ---
 - name: sign-certificate |> Pull "{{ client_name }}" certificate from OVPN server
-  synchronize:
-    src: "{{ easyrsa_client_req }}"
-    dest: /tmp
-    mode: pull
+  vars:
+    ovpn_host: "{{ hostvars['ovpn'] }}"
+  command: "/usr/bin/rsync -az --rsh=/usr/bin/ssh {{ ovpn_host.ansible_user}}@{{ ovpn_host.ansible_host }}:{{ easyrsa_client_req }} /tmp"
+
+- name: sign-certificate |> Gather facts for CA server # apparently ansible_env:HOME does not update dynamically
+  gather_facts:
 
 - name: sign-certificate |> Import client certificate
   command: ./easyrsa import-req "/tmp/{{ client_name }}.req" "{{ client_name }}"
@@ -21,7 +23,6 @@
     creates: "{{ easyrsa_client_crt }}"
 
 - name: sign-certificate |> Push client certificate to OVPN server
-  synchronize:
-    src: "{{ easyrsa_client_crt }}"
-    dest: /tmp
-    mode: push
+  vars:
+    ovpn_host: "{{ hostvars['ovpn'] }}"
+  command: "/usr/bin/rsync -az --rsh=/usr/bin/ssh {{ easyrsa_client_crt }} {{ ovpn_host.ansible_user}}@{{ ovpn_host.ansible_host }}:/tmp"

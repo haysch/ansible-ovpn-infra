@@ -13,5 +13,8 @@
   import_tasks: sign-certificate.yml
   delegate_to: ca
 
+- name: Gather facts for OVPN
+  gather_facts:
+
 - name: Generate client configuration
   import_tasks: generate-client-config.yml

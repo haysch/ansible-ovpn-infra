@@ -6,6 +6,7 @@
   import_tasks: generate-certificate.yml
 
 - name: Include CA group_vars
+  no_log: true
   include_vars: 
     dir: "{{ inventory_dir }}/group_vars/certauth"
     extensions:
@@ -15,6 +16,9 @@
 - name: Sign OpenVPN server certificates
   import_tasks: sign-certificate.yml
   delegate_to: ca
+
+- name: Gather facts for OVPN
+  gather_facts:
 
 - name: Install OpenVPN server certificates
   import_tasks: setup-certificate.yml

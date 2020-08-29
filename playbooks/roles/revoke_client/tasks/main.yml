@@ -10,5 +10,8 @@
   import_tasks: revoke.yml
   delegate_to: ca
 
+- name: Gather facts for OVPN
+  gather_facts:
+
 - name: Configure OpenVPN with new CRL list
   import_tasks: transfer_crl.yml

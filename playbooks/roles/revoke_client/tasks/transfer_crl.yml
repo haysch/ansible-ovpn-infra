@@ -1,9 +1,11 @@
 ---
-- name: transfer_crl |> Pull updated CRL from CA
-  synchronize:
-    src: "{{ ca_crl }}"
-    dest: /tmp
-    mode: push
+- name: transfer_crl |> Gather facts for CA server # apparently ansible_env:HOME does not update dynamically
+  gather_facts:
+
+- name: transfer_crl |> Push updated CRL to OVPN
+  vars:
+    ovpn_host: "{{ hostvars['ovpn'] }}"
+  command: "/usr/bin/rsync -az --rsh=/usr/bin/ssh {{ ca_crl }} {{ ovpn_host.ansible_user}}@{{ ovpn_host.ansible_host }}:/tmp"
   delegate_to: ca
 
 - name: transfer_crl |> Copy CRL to "{{ openvpn_path }}"

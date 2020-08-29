@@ -1,9 +1,11 @@
 ---
 - name: sign-certificate |> Pull OVPN certificate from OVPN server
-  synchronize:
-    src: "{{ easyrsa_path_pki }}/reqs/{{ openvpn_common_name }}.req"
-    dest: /tmp
-    mode: pull
+  vars:
+    ovpn_host: "{{ hostvars['ovpn'] }}"
+  command: "/usr/bin/rsync -az --rsh=/usr/bin/ssh {{ ovpn_host.ansible_user}}@{{ ovpn_host.ansible_host }}:{{ easyrsa_path_pki }}/reqs/{{ openvpn_common_name }}.req /tmp"
+
+- name: sign-certificate |> Gather facts for CA server # apparently ansible_env:HOME does not update dynamically
+  gather_facts:
 
 - name: sign-certificate |> Import OVPN certificate
   command: ./easyrsa import-req "/tmp/{{ openvpn_common_name }}.req" "{{ openvpn_common_name }}"
@@ -21,19 +23,16 @@
     creates: "{{ ca_ovpn_issued_crt }}"
 
 - name: sign-certificate |> Push OVPN certificate to OVPN server
-  synchronize:
-    src: "{{ ca_ovpn_issued_crt }}"
-    dest: /tmp
-    mode: push
+  vars:
+    ovpn_host: "{{ hostvars['ovpn'] }}"
+  command: "/usr/bin/rsync -az --rsh=/usr/bin/ssh {{ ca_ovpn_issued_crt }} {{ ovpn_host.ansible_user}}@{{ ovpn_host.ansible_host }}:/tmp"
 
 - name: sign-certificate |> Push CA certificate to OVPN server
-  synchronize:
-    src: "{{ ca_crt }}"
-    dest: /tmp
-    mode: push
+  vars:
+    ovpn_host: "{{ hostvars['ovpn'] }}"
+  command: "/usr/bin/rsync -az --rsh=/usr/bin/ssh {{ ca_crt }} {{ ovpn_host.ansible_user}}@{{ ovpn_host.ansible_host }}:/tmp"
 
 - name: sign-certificate |> Push CRL to OVPN server
-  synchronize:
-    src: "{{ ca_crl }}"
-    dest: /tmp
-    mode: push
+  vars:
+    ovpn_host: "{{ hostvars['ovpn'] }}"
+  command: "/usr/bin/rsync -az --rsh=/usr/bin/ssh {{ ca_crl }} {{ ovpn_host.ansible_user}}@{{ ovpn_host.ansible_host }}:/tmp"
