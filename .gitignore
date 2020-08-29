@@ -1,7 +1,8 @@
 # Extra Ansible vars and vault password file
 vars/
 vault.yml
-*vault_pass*
+.vault_pass.txt
+inventories/*
 
 # Testing files
 tests/docker_hosts
